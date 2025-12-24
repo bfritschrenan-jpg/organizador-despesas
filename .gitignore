@@ -1,0 +1,11 @@
+# Banco de dados local (SQLite)
+*.db
+
+# Ficheiros temporários do Python
+__pycache__/
+*.py[cod]
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
