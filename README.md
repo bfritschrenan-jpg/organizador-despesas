@@ -19,8 +19,9 @@ src/services: Coordenação e lógica de gestão.
 
 🛠️ Tecnologias Utilizadas
 
-Linguagem: Python 3.x.
+Linguagem: Python 3.13.7
 Paradigma: Programação Orientada a Objetos (POO)
+Ambiente: venv (Ambiente Virtual)
 Base de Dados: SQLite.
 Controlo de Versão: Git
 
