@@ -24,4 +24,3 @@ Paradigma: Programação Orientada a Objetos (POO)
 Ambiente: venv (Ambiente Virtual)
 Base de Dados: SQLite.
 Controlo de Versão: Git
-
