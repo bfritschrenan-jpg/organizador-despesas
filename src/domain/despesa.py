@@ -1,8 +1,10 @@
+from .categoria import Categoria
+
 class Despesa:
     def __init__(self, 
                  descricao: str, 
                  valor: float, 
-                 categoria: str, 
+                 categoria: Categoria, 
                  data_vencimento: str, 
                  tipo: str = "UNICA", 
                  status: str = "PENDENTE", 
