@@ -57,3 +57,15 @@ class DatabaseManager:
        
         conn.commit()
         conn.close()
+
+    def buscar_categoria_por_nome(self, nome):
+        conn = self.conectar()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM categorias WHERE nome = ?
+        ''',
+        (nome,)
+        )
+        resultado = cursor.fetchone()
+        conn.close()
+        return resultado
