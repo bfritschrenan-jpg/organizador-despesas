@@ -3,7 +3,7 @@ from src.domain.categoria import Categoria
 
 
 class DatabaseManager:
-    def __init__(self, db_name="organizador.db"):
+    def __init__(self, db_name="src/data/organizador.db"):
         self.db_name = db_name
         self.criar_tabelas()
 
