@@ -24,3 +24,11 @@ class CategoriaService:
         self.db.salvar_categoria(nova_categoria)
 
         return True, f"Sucesso: Categoria '{nome_categoria}' cadastrada!"
+    
+    def listar_todas_categorias(self):
+        categorias = self.db.listar_categorias()
+        categorias_obj = []
+        for categoria in categorias:
+            obj = Categoria(categoria[1], categoria[2])
+            categorias_obj.append(obj)
+        return categorias_obj
