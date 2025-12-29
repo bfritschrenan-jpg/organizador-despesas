@@ -69,3 +69,14 @@ class DatabaseManager:
         resultado = cursor.fetchone()
         conn.close()
         return resultado
+    
+    def listar_categorias(self):
+        conn = self.conectar()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM categorias
+        '''
+        )
+        categorias = cursor.fetchall()
+        conn.close()
+        return categorias
