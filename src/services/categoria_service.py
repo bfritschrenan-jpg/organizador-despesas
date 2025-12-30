@@ -32,3 +32,23 @@ class CategoriaService:
             obj = Categoria(categoria[1], categoria[0], categoria[2])
             categorias_obj.append(obj)
         return categorias_obj
+    
+    def remover_categoria(self, id_categoria):
+        sucesso = self.db.remover_categoria(id_categoria)
+        if sucesso:
+            return True, "Categoria removida com sucesso!"
+        return False, "Erro: Categoria não encontrada."
+    
+    def atualizar_categoria(self, id_categoria, novo_nome, nova_cor):
+        if not novo_nome:
+            return False, "Erro: A categoria precisa de um nome!"
+        
+        categorias = self.listar_todas_categorias()
+
+        if any(categoria.nome == novo_nome and categoria.id != id_categoria for categoria in categorias):
+            return False, f"Erro: Já existe outra categoria chamada '{novo_nome}'!"
+        
+        sucesso = self.db.atualizar_categoria(id_categoria, novo_nome, nova_cor)
+        if sucesso:
+            return True, "Categoria atualizada com sucesso!"
+        return False, "Erro ao atualizar: Categoria não encontrada."
