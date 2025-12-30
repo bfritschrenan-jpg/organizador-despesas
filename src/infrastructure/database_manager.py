@@ -80,3 +80,33 @@ class DatabaseManager:
         categorias = cursor.fetchall()
         conn.close()
         return categorias
+    
+    def remover_categoria(self, id_categoria):
+        conn = self.conectar()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            DELETE FROM categorias WHERE ID = ?
+        ''',
+        (id_categoria,)
+        )
+
+        linhas_afetadas = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return linhas_afetadas > 0
+    
+    def atualizar_categoria(self, id_categoria, novo_nome, nova_cor):
+        conn = self.conectar()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            UPDATE categorias SET nome = ?, cor = ? WHERE ID = ?
+        ''',
+        (novo_nome, nova_cor, id_categoria)
+        )
+
+        linhas_afetadas = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return linhas_afetadas > 0
