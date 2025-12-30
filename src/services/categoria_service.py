@@ -29,6 +29,6 @@ class CategoriaService:
         categorias = self.db.listar_categorias()
         categorias_obj = []
         for categoria in categorias:
-            obj = Categoria(categoria[1], categoria[2])
+            obj = Categoria(categoria[1], categoria[0], categoria[2])
             categorias_obj.append(obj)
         return categorias_obj

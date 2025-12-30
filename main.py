@@ -30,7 +30,7 @@ def main():
             else:
                 print("\n--- LISTA DE CATEGORIAS ---")
                 for categoria in lista:
-                    print(f"📌 {categoria.nome} (Cor: {categoria.cor})")
+                    print(f"📌 ID: {categoria.id} | {categoria.nome} (Cor: {categoria.cor})")
 
 
         else:
