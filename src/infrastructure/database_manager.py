@@ -110,3 +110,66 @@ class DatabaseManager:
         conn.commit()
         conn.close()
         return linhas_afetadas > 0
+    
+    # FUNÇÕES DESPESAS
+
+    def salvar_despesa(self, despesa):
+        conn = self.conectar()
+        cursor = conn.cursor()
+
+        # O SQL precisa ter a mesma ordem dos valores na tupla abaixo
+        cursor.execute('''
+            INSERT INTO despesas (
+                descricao, valor, data_vencimento, status, 
+                tipo, total_parcelas, parcela_atual, categoria_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''',
+        (despesa.descricao,
+            despesa.valor,
+            despesa.data_vencimento,
+            despesa.status,
+            despesa.tipo,
+            despesa.total_parcelas,
+            despesa.parcela_atual,
+            despesa.categoria.id)
+        )
+        
+        conn.commit()
+        conn.close()
+
+    def listar_despesas(self):
+        conn = self.conectar()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT 
+                despesas.id, 
+                despesas.descricao, 
+                despesas.valor, 
+                despesas.data_vencimento, 
+                despesas.status, 
+                despesas.tipo, 
+                despesas.total_parcelas, 
+                despesas.parcela_atual,
+                categorias.nome
+            FROM despesas
+            INNER JOIN categorias ON despesas.categoria_id = categorias.id 
+        ''')
+
+        despesas = cursor.fetchall()
+        conn.close()
+        return despesas
+    
+    def remover_despesa(self, id_despesa):
+        conn = self.conectar()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            DELETE FROM despesas WHERE ID = ?
+        ''',
+        (id_despesa,)
+        )
+        linhas_afetadas = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return linhas_afetadas > 0
