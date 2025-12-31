@@ -55,6 +55,38 @@ def fluxo_remover_categoria(service):
     except ValueError:
            print("\n❌ Erro: Você precisa digitar um número válido para o ID!")
 
+def fluxo_editar_categoria(service):
+    print("\n--- EDITAR CATEGORIA ---")
+    lista = service.listar_todas_categorias()
+    if not lista:
+        print("⚠️ Nenhuma categoria disponível para editar.")
+        return
+    for categoria in lista:
+        print(f"[{categoria.id}] {categoria.nome}")
+    try:
+        id_selecionado = int(input("\nDigite o ID da categoria que deseja editar: "))
+        categoria_alvo = None
+
+        for categoria in lista:
+            if categoria.id == id_selecionado:
+                categoria_alvo = categoria
+        if categoria_alvo is not None:
+            print(f"\n⚠️  AVISO: Você está prestes a editar a categoria '{categoria_alvo.nome}'.")
+            confirmacao = input("Tem certeza absoluta? (S/N): ").upper().strip()
+            if confirmacao == "S":
+                novo_nome = input("Novo nome (ou aperte Enter para manter): ")
+                if novo_nome == "":  # Se ele apenas apertou Enter
+                    novo_nome = categoria_alvo.nome
+                nova_cor = input("Nova cor (ou aperte Enter para manter): ")
+                if nova_cor == "":  # Se ele apenas apertou Enter
+                    nova_cor = categoria_alvo.cor
+                sucesso, mensagem = service.atualizar_categoria(id_selecionado, novo_nome, nova_cor)
+                print(f"\n>>> {mensagem}")
+            else: 
+                print("\nOperação cancelada.")
+    except ValueError:
+           print("\n❌ Erro: Você precisa digitar um número válido para o ID!")
+
 # --- FUNÇÃO PRINCIPAL ---
 
 def main():
@@ -78,9 +110,10 @@ def main():
             fluxo_listar_categorias(cat_service)
         elif opcao == "2":
             fluxo_cadastrar_categoria(cat_service)
+        elif opcao == "3":
+            fluxo_editar_categoria(cat_service)    
         elif opcao == "4":
             fluxo_remover_categoria(cat_service)    
-        # Próximos passos: Opção 3 e 4
         else:
             print("\n❌ Opção inválida!")
 
