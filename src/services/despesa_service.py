@@ -59,3 +59,31 @@ class DespesaService:
                           categoria_encontrada )
         
         self.db.salvar_despesa(nova_despesa)
+
+        return True, "✅ Despesa cadastrada com sucesso!"
+    
+    def listar_despesas(self):
+        despesas = self.db.listar_despesas()
+        despesas_objetos = []
+        for despesa in despesas:
+
+            obj = Despesa(despesa[1],
+                          despesa[2],
+                          despesa[3],
+                          despesa[4],
+                          despesa[5],
+                          despesa[6],
+                          despesa[7],
+                          despesa[8],
+                          despesa[9])
+            
+            obj.id = despesa[0]
+            despesas_objetos.append(obj)
+
+        return despesas_objetos
+    
+    def remover_despesa(self, id_despesa):
+        sucesso = self.db.remover_despesa(id_despesa)
+        if sucesso:
+            return True, "Despesa removida com sucesso!"
+        return False, "Erro: Despesa não encontrada."

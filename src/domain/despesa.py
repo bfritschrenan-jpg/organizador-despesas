@@ -3,14 +3,15 @@ from .categoria import Categoria
 class Despesa:
     def __init__(self, 
                  descricao: str, 
-                 valor: float, 
-                 categoria: Categoria, 
-                 data_vencimento: str, 
+                 valor: float,
+                 data_vencimento: str,
+                 categoria: Categoria,
+                 status: str = "PENDENTE",
                  tipo: str = "UNICA", 
-                 status: str = "PENDENTE", 
                  total_parcelas: int = None, 
-                 parcela_atual: int = None):
-
+                 parcela_atual: int = None,
+                 nome_categoria = None ):
+        
         self.descricao = descricao
         self.valor = valor
         self.categoria = categoria
@@ -19,4 +20,4 @@ class Despesa:
         self.tipo = tipo.upper()
         self.total_parcelas = total_parcelas 
         self.parcela_atual = parcela_atual
-        
+        self.nome_categoria = nome_categoria
