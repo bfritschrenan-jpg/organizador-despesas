@@ -1,8 +1,11 @@
 import os
 from src.infrastructure.database_manager import DatabaseManager
 from src.services.categoria_service import CategoriaService
+from src.services.despesa_service import DespesaService
+from datetime import datetime, date
 
-# --- FUNÇÕES DE APOIO (HELPERS) ---
+# --- FUNÇÕES DE APOIO  CATEGORIAS (HELPERS) ---
+
 
 def fluxo_listar_categorias(service):
     print("\n--- LISTA DE CATEGORIAS ---")
@@ -17,8 +20,9 @@ def fluxo_cadastrar_categoria(service):
     print("\n--- CADASTRAR NOVA CATEGORIA ---")
     nome = input("Nome da Categoria: ")
     cor = input("Cor (Deixe vazio para padrão): ")
-    sucesso, mensagem = service.cadastrar_categoria(nome, cor)
+    sucesso, mensagem, categoria_obj = service.cadastrar_categoria(nome, cor)
     print(f"\n>>> {mensagem}")
+    return sucesso, categoria_obj
 
 def fluxo_remover_categoria(service):
     print("\n--- REMOVER CATEGORIA ---")
@@ -87,11 +91,157 @@ def fluxo_editar_categoria(service):
     except ValueError:
            print("\n❌ Erro: Você precisa digitar um número válido para o ID!")
 
+
+# --- FUNÇÕES DE APOIO DESPESA ---
+
+
+def fluxo_cadastrar_despesa(service):
+
+    descricao = while_true("Descrição")
+
+    valor = while_true("Valor", tipo=float, validacao=lambda valor_inteiro: valor_inteiro > 0)
+
+    data_vencimento = while_true("Data de vencimento (ano-mês-dia)", validacao=verifica_data)
+    data_venc_objeto = datetime.strptime(data_vencimento, "%Y-%m-%d").date()
+    data_atual = date.today()
+
+    status = while_true("digite 1 para paga e 2 para pendente", opcoes=["1", "2"])
+    
+    if status == "1":
+        status = "pago"
+    else: 
+        status = "pendente"
+
+    if status == "pendente" and data_venc_objeto < data_atual:
+        status = "atrasada"
+
+    tipo = while_true("Digite 1 para despesa fixa e 2 para unica e 3 para parcelada", opcoes=["1", "2", "3"])
+
+
+    if tipo == "3":
+        tipo = "parcelada"
+        total_parcelas = while_true("Digite o total de parcelas", tipo=int, validacao=lambda valor_inteiro: valor_inteiro > 0)
+    elif tipo == "2":
+        tipo = "unica"
+        total_parcelas = 0
+    else: 
+        tipo = "fixa" 
+        total_parcelas = 0
+      
+
+    lista = service_db().listar_todas_categorias()
+    lista_id = []
+    
+    if not lista:
+        print("⚠️ Nenhuma categoria cadastrada.")
+        categoria_id = while_true("Degite 1 para cadastar uma nova categoria ou 2 para dexar sem categoria", opcoes=["1", "2"])
+        if categoria_id == "1":
+            nova_categoria, nova_categoria_id = fluxo_cadastrar_categoria(service_db())
+            while nova_categoria == False:
+                fluxo_cadastrar_categoria(service_db())
+            categoria_id = nova_categoria_id.id
+        else:
+            categoria_id = ""
+    else:
+        for categoria in lista:
+            lista_id.append(categoria.id)
+        print('')
+        print(lista)
+        print(lista_id)
+        fluxo_listar_categorias(service_db())
+        print('')
+        categoria_id = while_true("Digite o ID da categoria ou tecle ENTER para dexar sem categoria", tipo=int, opcoes=lista_id)
+
+        categoria_obj = next((obj for obj in lista if obj.id == categoria_id))
+        print(categoria_obj.nome)
+
+    parcela_atual = None
+
+
+    if total_parcelas > 0:
+        for i in range(1, total_parcelas + 1):
+            descricao = f"{descricao} - {i}/{total_parcelas}"
+            parcela_atual = i
+            sucesso, mensagem = service.cadastrar_despesa(descricao, 
+                          valor, 
+                          data_vencimento,
+                          status, 
+                          tipo,
+                          total_parcelas, 
+                          parcela_atual, 
+                          categoria_obj)
+    else:
+        sucesso, mensagem = service.cadastrar_despesa(descricao, 
+                          valor, 
+                          data_vencimento,
+                          status, 
+                          tipo,
+                          total_parcelas, 
+                          parcela_atual, 
+                          categoria_obj)
+
+    print(f"\n>>> ✅ Despesa cadastrada com sucesso!")
+
+def fluxo_listar_despesas(service):
+    print("\n--- LISTA DE DESPESAS ---")
+    lista = service.listar_despesas()
+    if not lista:
+        print("⚠️ Nenhuma despesa cadastrada cadastrada.")
+        return
+    for des in lista:
+        print(f"\n📌 [ID: {des.id}] {des.descricao} (Valor: {des.valor}) (status: {des.status}) (Categoria: {des.descricao})")
+
+# --- FUNÇÕES AUXILIARES ---
+
+
+def verifica_data(data_texto):
+    try:
+        datetime.strptime(data_texto, "%Y-%m-%d")
+        return True
+    except ValueError:
+        return False
+    
+def while_true(texto, tipo=str, validacao=None, opcoes=None):
+    while True:
+        try:
+            if validacao == verifica_data:
+                    print("\n📅 (Dica: O formato deve ser AAAA-MM-DD, ex: 2025-12-31)\n")
+            
+            resposta = input(f"{texto}:\n>>> ").strip()
+            resposta = tipo(resposta)
+
+            if opcoes is not None:
+                if resposta not in opcoes:
+                    raise Exception(f"Opção inválida!")
+
+            if validacao is not None:              
+
+                if not validacao(resposta):                    
+                    if validacao == verifica_data:
+                        raise Exception("Data inválida ou inexistente!")
+                    else:
+                        raise ValueError("Validação falhou")
+
+            # print(f"{texto}: {resposta}")
+            return resposta
+        except ValueError:
+            print("\n❌ Erro: Digite apenas números! (Use ponto em vez de vírgula, ex: 25.50)\n")
+
+        except Exception as e:
+            print(f"\nerro: {e} - Tente Novamente\n")
+
+def despesa_service_db():
+    db = DatabaseManager()
+    categoria_service = CategoriaService(db)
+    return DespesaService(db, categoria_service)
+
+def service_db():
+    db = DatabaseManager()
+    return CategoriaService(db)
+
 # --- FUNÇÃO PRINCIPAL ---
 
 def main():
-    db = DatabaseManager()
-    cat_service = CategoriaService(db)
 
     while True:
         print("\n=== ORGANIZADOR DE DESPESAS ===")
@@ -99,6 +249,8 @@ def main():
         print("2. Cadastrar Categoria")
         print("3. Editar Categoria")
         print("4. Excluir Categoria")
+        print("5. Cadastrar Despesa")
+        print("6. Listar Despesas")
         print("0. Sair")
         
         opcao = input("\nEscolha uma opção: ")
@@ -107,13 +259,17 @@ def main():
             print("Saindo... Até logo!")
             break
         elif opcao == "1":
-            fluxo_listar_categorias(cat_service)
+            fluxo_listar_categorias(service_db())
         elif opcao == "2":
-            fluxo_cadastrar_categoria(cat_service)
+            fluxo_cadastrar_categoria(service_db())
         elif opcao == "3":
-            fluxo_editar_categoria(cat_service)    
+            fluxo_editar_categoria(service_db())    
         elif opcao == "4":
-            fluxo_remover_categoria(cat_service)    
+            fluxo_remover_categoria(service_db())
+        elif opcao == "5":
+            fluxo_cadastrar_despesa(despesa_service_db())
+        elif opcao == "6":
+            fluxo_listar_despesas(despesa_service_db())    
         else:
             print("\n❌ Opção inválida!")
 

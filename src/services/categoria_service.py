@@ -23,7 +23,7 @@ class CategoriaService:
             
         self.db.salvar_categoria(nova_categoria)
 
-        return True, f"Sucesso: Categoria '{nome_categoria}' cadastrada!"
+        return True, f"Sucesso: Categoria '{nome_categoria}' cadastrada!", nova_categoria
     
     def listar_todas_categorias(self):
         categorias = self.db.listar_categorias()

@@ -5,7 +5,7 @@ class Despesa:
                  descricao: str, 
                  valor: float,
                  data_vencimento: str,
-                 categoria: Categoria,
+                 categoria_obj: Categoria,
                  status: str = "PENDENTE",
                  tipo: str = "UNICA", 
                  total_parcelas: int = None, 
@@ -14,10 +14,10 @@ class Despesa:
         
         self.descricao = descricao
         self.valor = valor
-        self.categoria = categoria
+        self.categoria = categoria_obj
         self.data_vencimento = data_vencimento
         self.status = status
-        self.tipo = tipo.upper()
+        self.tipo = tipo
         self.total_parcelas = total_parcelas 
         self.parcela_atual = parcela_atual
         self.nome_categoria = nome_categoria

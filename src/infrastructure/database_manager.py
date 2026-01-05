@@ -1,6 +1,6 @@
 import sqlite3
 from src.domain.categoria import Categoria
-
+from src.domain.despesa import Despesa
 
 class DatabaseManager:
     def __init__(self, db_name="src/data/organizador.db"):
@@ -116,7 +116,7 @@ class DatabaseManager:
     def salvar_despesa(self, despesa):
         conn = self.conectar()
         cursor = conn.cursor()
-
+        print(despesa.categoria)
         # O SQL precisa ter a mesma ordem dos valores na tupla abaixo
         cursor.execute('''
             INSERT INTO despesas (
