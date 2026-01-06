@@ -1,11 +1,9 @@
-import os
 from src.infrastructure.database_manager import DatabaseManager
 from src.services.categoria_service import CategoriaService
 from src.services.despesa_service import DespesaService
 from datetime import datetime, date
 
 # --- FUNÇÕES DE APOIO  CATEGORIAS (HELPERS) ---
-
 
 def fluxo_listar_categorias(service):
     print("\n--- LISTA DE CATEGORIAS ---")
@@ -91,27 +89,20 @@ def fluxo_editar_categoria(service):
     except ValueError:
            print("\n❌ Erro: Você precisa digitar um número válido para o ID!")
 
-
 # --- FUNÇÕES DE APOIO DESPESA ---
-
 
 def fluxo_cadastrar_despesa(service):
 
     descricao = while_true("Descrição")
-
     valor = while_true("Valor", tipo=float, validacao=lambda valor_inteiro: valor_inteiro > 0)
-
     data_vencimento = while_true("Data de vencimento (ano-mês-dia)", validacao=verifica_data)
     data_venc_objeto = datetime.strptime(data_vencimento, "%Y-%m-%d").date()
     data_atual = date.today()
-
     status = while_true("digite 1 para paga e 2 para pendente", opcoes=["1", "2"])
-    
     if status == "1":
         status = "pago"
     else: 
         status = "pendente"
-
     if status == "pendente" and data_venc_objeto < data_atual:
         status = "atrasada"
 
@@ -141,22 +132,20 @@ def fluxo_cadastrar_despesa(service):
                 fluxo_cadastrar_categoria(service_db())
             categoria_id = nova_categoria_id.id
         else:
-            categoria_id = ""
+            categoria_id = None
     else:
         for categoria in lista:
             lista_id.append(categoria.id)
-        print('')
-        print(lista)
-        print(lista_id)
+        
         fluxo_listar_categorias(service_db())
-        print('')
-        categoria_id = while_true("Digite o ID da categoria ou tecle ENTER para dexar sem categoria", tipo=int, opcoes=lista_id)
-
-        categoria_obj = next((obj for obj in lista if obj.id == categoria_id))
-        print(categoria_obj.nome)
-
+        categoria_id = while_true("Digite o ID da categoria ou tecle ENTER para dexar sem categoria", tipo=int, opcoes=lista_id, campo="categoria")
+        if categoria_id is not None:
+            categoria_obj = next((obj for obj in lista if obj.id == categoria_id))
+            categoria = categoria_obj
+        else: 
+            categoria = categoria_id
+            
     parcela_atual = None
-
 
     if total_parcelas > 0:
         for i in range(1, total_parcelas + 1):
@@ -169,7 +158,7 @@ def fluxo_cadastrar_despesa(service):
                           tipo,
                           total_parcelas, 
                           parcela_atual, 
-                          categoria_obj)
+                          categoria)
     else:
         sucesso, mensagem = service.cadastrar_despesa(descricao, 
                           valor, 
@@ -178,7 +167,7 @@ def fluxo_cadastrar_despesa(service):
                           tipo,
                           total_parcelas, 
                           parcela_atual, 
-                          categoria_obj)
+                          categoria)
 
     print(f"\n>>> ✅ Despesa cadastrada com sucesso!")
 
@@ -188,11 +177,19 @@ def fluxo_listar_despesas(service):
     if not lista:
         print("⚠️ Nenhuma despesa cadastrada cadastrada.")
         return
-    for des in lista:
-        print(f"\n📌 [ID: {des.id}] {des.descricao} (Valor: {des.valor}) (status: {des.status}) (Categoria: {des.descricao})")
+    for despesa in lista:
+        print(f"\n📌 [ID: {despesa.id}] {despesa.descricao} (Valor: {despesa.valor}) (status: {despesa.status}) (Categoria: {despesa.nome_categoria})")
 
+def fluxo_remover_despesa(service):
+    fluxo_listar_despesas(service)
+    id_despesa = while_true("Digite o ID da despesa a remover:\n>>> ", tipo=int)
+    sucesso, mensagem= service.remover_despesa(id_despesa)
+    print(mensagem)
+
+def fluxo_atualizar_despesa(service):
+ pass
+    
 # --- FUNÇÕES AUXILIARES ---
-
 
 def verifica_data(data_texto):
     try:
@@ -201,9 +198,15 @@ def verifica_data(data_texto):
     except ValueError:
         return False
     
-def while_true(texto, tipo=str, validacao=None, opcoes=None):
+def while_true(texto, tipo=str, validacao=None, opcoes=None, campo=None):
     while True:
         try:
+            if campo == "categoria":
+                resposta = input(f"{texto}:\n>>> ").strip()
+                if not resposta:
+                    resposta = None
+                    return resposta
+
             if validacao == verifica_data:
                     print("\n📅 (Dica: O formato deve ser AAAA-MM-DD, ex: 2025-12-31)\n")
             
@@ -251,7 +254,9 @@ def main():
         print("4. Excluir Categoria")
         print("5. Cadastrar Despesa")
         print("6. Listar Despesas")
-        print("0. Sair")
+        print("7. Remover Despesa")
+        print("8. Editar Despesa")
+        print("\n\n0. Sair")
         
         opcao = input("\nEscolha uma opção: ")
 
@@ -269,7 +274,11 @@ def main():
         elif opcao == "5":
             fluxo_cadastrar_despesa(despesa_service_db())
         elif opcao == "6":
-            fluxo_listar_despesas(despesa_service_db())    
+            fluxo_listar_despesas(despesa_service_db())
+        elif opcao == "7":
+            fluxo_remover_despesa(despesa_service_db())
+        elif opcao == "8":
+            fluxo_atualizar_despesa(despesa_service_db())
         else:
             print("\n❌ Opção inválida!")
 

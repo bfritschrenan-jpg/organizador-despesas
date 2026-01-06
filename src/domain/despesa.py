@@ -1,11 +1,11 @@
 from .categoria import Categoria
-
+from typing import Optional
 class Despesa:
     def __init__(self, 
                  descricao: str, 
                  valor: float,
                  data_vencimento: str,
-                 categoria_obj: Categoria,
+                 categoria_obj: Optional[Categoria] = None,
                  status: str = "PENDENTE",
                  tipo: str = "UNICA", 
                  total_parcelas: int = None, 

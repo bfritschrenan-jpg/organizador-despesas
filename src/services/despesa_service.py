@@ -37,7 +37,7 @@ class DespesaService:
         despesas = self.db.listar_despesas()
         despesas_objetos = []
         for despesa in despesas:
-
+            print(despesa)
             obj = Despesa(despesa[1],
                           despesa[2],
                           despesa[3],
@@ -50,7 +50,7 @@ class DespesaService:
             
             obj.id = despesa[0]
             despesas_objetos.append(obj)
-
+        print(despesas_objetos)
         return despesas_objetos
     
     def remover_despesa(self, id_despesa):

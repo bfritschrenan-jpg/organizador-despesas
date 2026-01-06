@@ -116,7 +116,8 @@ class DatabaseManager:
     def salvar_despesa(self, despesa):
         conn = self.conectar()
         cursor = conn.cursor()
-        print(despesa.categoria)
+        categoria_id = despesa.categoria.id if despesa.categoria is not None else None
+    
         # O SQL precisa ter a mesma ordem dos valores na tupla abaixo
         cursor.execute('''
             INSERT INTO despesas (
@@ -131,7 +132,7 @@ class DatabaseManager:
             despesa.tipo,
             despesa.total_parcelas,
             despesa.parcela_atual,
-            despesa.categoria.id)
+            categoria_id)
         )
         
         conn.commit()
@@ -154,7 +155,7 @@ class DatabaseManager:
                 despesas.parcela_atual,
                 categorias.nome
             FROM despesas
-            INNER JOIN categorias ON despesas.categoria_id = categorias.id 
+            LEFT JOIN categorias ON despesas.categoria_id = categorias.id 
         ''')
 
         despesas = cursor.fetchall()
